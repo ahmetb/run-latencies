@@ -27,7 +27,7 @@ func main() {
 }
 
 func home(w http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodGet {
+	if req.Method != http.MethodGet && req.Method != http.MethodHead {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		fmt.Fprintf(w, "method %s not allowed", req.Method)
 		return
@@ -42,5 +42,8 @@ func home(w http.ResponseWriter, req *http.Request) {
 	} else {
 		w.Header().Set("request-state", "cold")
 	}
-	w.Write(respBody)
+
+	if req.Method == http.MethodGet {
+		w.Write(respBody)
+	}
 }
