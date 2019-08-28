@@ -2,14 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"runprobe/prober"
 	"strings"
 )
-
 
 type Resp struct {
 	Success bool                 `json:"success"`
@@ -18,6 +16,8 @@ type Resp struct {
 }
 
 func init() { log.SetFlags(log.Lmicroseconds) }
+
+var _ http.HandlerFunc = Probe // type checks
 
 func Probe(w http.ResponseWriter, req *http.Request) {
 	uv := req.URL.Query().Get("url")
@@ -66,8 +66,4 @@ func respond(w http.ResponseWriter, r Resp) {
 	e := json.NewEncoder(w)
 	e.SetIndent("", "  ")
 	e.Encode(r)
-}
-
-func Home(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "ok")
 }
