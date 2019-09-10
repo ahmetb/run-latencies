@@ -1,4 +1,4 @@
-package run_latencies
+package main
 
 import (
 	"log"

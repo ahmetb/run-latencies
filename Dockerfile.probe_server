@@ -1,0 +1,10 @@
+FROM golang:1-alpine
+WORKDIR /src
+COPY . .
+RUN env CGO_ENABLED=0 go build -tags netgo -o probe_server.out ./cmd/probe_server
+
+FROM alpine:latest
+RUN apk add --no-cache ca-certificates
+COPY --from=0 /src/probe_server.out /bin/probe_server
+RUN test -x /bin/probe_server
+ENTRYPOINT ["/bin/probe_server"]

@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var Netgo bool
+
 type ErrorKind string
 
 const (
@@ -29,9 +31,10 @@ type ErrorOutcome struct {
 }
 
 type Measurement struct {
-	Stages     []Stage     `json:"stages,omitempty"`
-	StatusCode int         `json:"status_code,omitempty"`
-	TotalMs    int         `json:"total_ms,omitempty"`
+	Stages       []Stage `json:"stages,omitempty"`
+	StatusCode   int     `json:"status_code,omitempty"`
+	TotalMs      int     `json:"total_ms,omitempty"`
+	RequestState string  `json:"request_state,omitempty"`
 }
 
 func Probe(u *url.URL) (*Measurement, *ErrorOutcome) {
@@ -118,6 +121,7 @@ func Probe(u *url.URL) (*Measurement, *ErrorOutcome) {
 	return &Measurement{
 		StatusCode: resp.StatusCode,
 		TotalMs:    int(total / time.Millisecond),
+		RequestState: resp.Header.Get("request-state"),
 		Stages: []Stage{
 			{Name: "dns",
 				DurationMs: int(dnsDuration / time.Millisecond)},
@@ -132,3 +136,11 @@ func Probe(u *url.URL) (*Measurement, *ErrorOutcome) {
 		},
 	}, nil
 }
+
+type ProbeResp struct {
+	Netgo   bool          `json:"netgo"`
+	Success bool          `json:"success"`
+	Data    *Measurement  `json:"data,omitempty"`
+	Error   *ErrorOutcome `json:"error,omitempty"`
+}
+
